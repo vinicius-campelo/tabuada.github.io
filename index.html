@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabuada Turbo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EAF7FF;
+    --bg-2: #DFF3FF;
+    --panel: #FFFFFF;
+    --ink: #1F2A44;
+    --ink-soft: #5B6584;
+    --primary: #2EC4B6;
+    --primary-dark: #1E9E93;
+    --happy: #FFC145;
+    --happy-dark: #E3A600;
+    --oops: #FF6B6B;
+    --oops-dark: #E14F4F;
+    --border: #1F2A44;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 12% 18%, #FFFFFF55 0, transparent 40%),
+      radial-gradient(circle at 85% 80%, #FFFFFF55 0, transparent 40%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    font-family: 'Nunito', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .stage {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 6vw, 40px);
+    text-align: center;
+    margin: 0 0 6px;
+    letter-spacing: 0.5px;
+  }
+  .title span { color: var(--primary-dark); }
+
+  .subtitle {
+    text-align: center;
+    color: var(--ink-soft);
+    font-weight: 700;
+    margin: 0 0 22px;
+    font-size: 15px;
+  }
+
+  .hud {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .hud-pill {
+    background: var(--panel);
+    border: 3px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    box-shadow: 4px 4px 0 var(--border);
+  }
+  .hud-pill svg { width: 22px; height: 22px; flex-shrink: 0; }
+  #acertos-count { color: var(--primary-dark); }
+  #erros-count { color: var(--oops-dark); }
+
+  .card {
+    background: var(--panel);
+    border: 4px solid var(--border);
+    border-radius: 28px;
+    padding: 34px 28px 30px;
+    box-shadow: 10px 10px 0 var(--border);
+    position: relative;
+  }
+
+  .problem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: clamp(40px, 11vw, 58px);
+    color: var(--ink);
+    margin-bottom: 26px;
+    user-select: none;
+  }
+
+  .problem .op {
+    color: var(--primary-dark);
+  }
+
+  #answer {
+    width: 108px;
+    height: 78px;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: clamp(34px, 9vw, 46px);
+    font-weight: 700;
+    text-align: center;
+    border: 4px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    -moz-appearance: textfield;
+    transition: transform 0.08s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    box-shadow: 5px 5px 0 var(--border);
+  }
+  #answer::-webkit-outer-spin-button,
+  #answer::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  #answer:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 5px 5px 0 var(--primary-dark);
+  }
+
+  #answer.certo {
+    border-color: var(--primary-dark);
+    background: #E4FBF6;
+    animation: pop 0.35s ease;
+  }
+  #answer.errado {
+    border-color: var(--oops-dark);
+    background: #FFEDED;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  #verificar {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    background: var(--primary);
+    border: 4px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 34px;
+    cursor: pointer;
+    box-shadow: 6px 6px 0 var(--border);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+  }
+  #verificar:hover { background: var(--primary-dark); }
+  #verificar:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0 var(--border);
+  }
+  #verificar:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+    box-shadow: 6px 6px 0 var(--border);
+  }
+
+  .feedback {
+    margin-top: 20px;
+    min-height: 34px;
+    text-align: center;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .feedback.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .feedback.certo-txt { color: var(--primary-dark); }
+  .feedback.errado-txt { color: var(--oops-dark); }
+
+  .progress-track {
+    margin-top: 24px;
+    height: 10px;
+    background: var(--bg);
+    border: 3px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--happy);
+    transition: width 0.6s linear;
+  }
+
+  .hint {
+    text-align: center;
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <h1 class="title">Tabuada <span>Turbo</span></h1>
+  <p class="subtitle">Responda rápido e vá treinando a tabuada!</p>
+
+  <div class="hud">
+    <div class="hud-pill">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l2.9 6.26L21.5 9l-4.75 4.63L17.9 21 12 17.77 6.1 21l1.15-7.37L2.5 9l6.6-0.74L12 2z" fill="#FFC145" stroke="#1F2A44" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span id="acertos-count">0</span>
+    </div>
+    <div class="hud-pill">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#FF6B6B" stroke="#1F2A44" stroke-width="1.4"/><path d="M9 9l6 6M15 9l-6 6" stroke="#1F2A44" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span id="erros-count">0</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="problem">
+      <span id="fator1">?</span>
+      <span class="op">×</span>
+      <span id="fator2">?</span>
+      <span class="op">=</span>
+      <input id="answer" type="number" inputmode="numeric" autocomplete="off" autofocus>
+    </div>
+
+    <div class="actions">
+      <button id="verificar">Verificar</button>
+    </div>
+
+    <p class="feedback" id="feedback"></p>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <p class="hint">Dica: aperte Enter para verificar mais rápido.</p>
+</div>
+
+<script>
+  const fator1El = document.getElementById('fator1');
+  const fator2El = document.getElementById('fator2');
+  const answerEl = document.getElementById('answer');
+  const verificarBtn = document.getElementById('verificar');
+  const feedbackEl = document.getElementById('feedback');
+  const acertosEl = document.getElementById('acertos-count');
+  const errosEl = document.getElementById('erros-count');
+  const progressFill = document.getElementById('progress-fill');
+
+  const MIN_TABUADA = 1;
+  const MAX_TABUADA = 10;
+  const NEXT_DELAY_MS = 1400;
+
+  let fator1 = 0;
+  let fator2 = 0;
+  let acertos = 0;
+  let erros = 0;
+  let travado = false;
+  let progressTimer = null;
+
+  const mensagensCerto = [
+    'Isso aí! Você acertou! 🎉',
+    'Mandou bem! 🚀',
+    'Boa! Continue assim! ⭐',
+    'Perfeito! 💪'
+  ];
+
+  const mensagensErrado = [
+    (r) => `Quase! O resultado certo era ${r}.`,
+    (r) => `Não foi dessa vez. A resposta era ${r}.`,
+    (r) => `Errou, mas tudo bem! Era ${r}. Vamos para a próxima!`
+  ];
+
+  function numeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function sortear(lista) {
+    return lista[Math.floor(Math.random() * lista.length)];
+  }
+
+  function novaTabuada() {
+    fator1 = numeroAleatorio(MIN_TABUADA, MAX_TABUADA);
+    fator2 = numeroAleatorio(MIN_TABUADA, MAX_TABUADA);
+    fator1El.textContent = fator1;
+    fator2El.textContent = fator2;
+
+    answerEl.value = '';
+    answerEl.classList.remove('certo', 'errado');
+    feedbackEl.classList.remove('show', 'certo-txt', 'errado-txt');
+    feedbackEl.textContent = '';
+
+    verificarBtn.disabled = false;
+    travado = false;
+
+    progressFill.style.transition = 'none';
+    progressFill.style.width = '0%';
+
+    answerEl.focus();
+  }
+
+  function mostrarFeedback(acertou, respostaCerta) {
+    feedbackEl.textContent = acertou
+      ? sortear(mensagensCerto)
+      : sortear(mensagensErrado)(respostaCerta);
+    feedbackEl.classList.add('show', acertou ? 'certo-txt' : 'errado-txt');
+  }
+
+  function iniciarBarraProgresso() {
+    requestAnimationFrame(() => {
+      progressFill.style.transition = `width ${NEXT_DELAY_MS}ms linear`;
+      progressFill.style.width = '100%';
+    });
+  }
+
+  function verificarResposta() {
+    if (travado) return;
+
+    const respostaCerta = fator1 * fator2;
+    const valorDigitado = answerEl.value.trim();
+
+    if (valorDigitado === '') {
+      answerEl.focus();
+      return;
+    }
+
+    const respostaDada = parseInt(valorDigitado, 10);
+    const acertou = respostaDada === respostaCerta;
+
+    travado = true;
+    verificarBtn.disabled = true;
+
+    if (acertou) {
+      acertos++;
+      acertosEl.textContent = acertos;
+      answerEl.classList.add('certo');
+    } else {
+      erros++;
+      errosEl.textContent = erros;
+      answerEl.classList.add('errado');
+    }
+
+    mostrarFeedback(acertou, respostaCerta);
+    iniciarBarraProgresso();
+
+    progressTimer = setTimeout(novaTabuada, NEXT_DELAY_MS);
+  }
+
+  verificarBtn.addEventListener('click', verificarResposta);
+
+  answerEl.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter') {
+      evento.preventDefault();
+      verificarResposta();
+    }
+  });
+
+  novaTabuada();
+</script>
+
+</body>
+</html>
